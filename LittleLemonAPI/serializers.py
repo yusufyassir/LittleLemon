@@ -7,14 +7,18 @@ User = get_user_model()
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'slug', 'title']
+        fields = ['id', 'title', 'slug']
 
 class MenuItemSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all()
+    )
 
     class Meta:
         model = MenuItem
         fields = ['id', 'title', 'price', 'featured', 'category']
+
+    
 
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset= User.objects.all())
