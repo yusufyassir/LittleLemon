@@ -3,21 +3,38 @@ from .serializers import MenuItemSerializer, CategorySerializer
 from .models import MenuItem, Category
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, Group
 from rest_framework.response import Response
+from .permissions import IsManager
 # Create your views here.
 
 class CategoriesView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
+    permission_classes = [IsAdminUser]
+    
 
 class MenuItemView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
+    def get_permissions(self):
+        permission_classes =[]
+        if self.request.method != 'GET':
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+    
+class SingleMenuItem(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    def get_permissions(self):
+        permission_classes =[]
+        if self.request.method != 'GET':
+            permission_classes = [IsAdminUser | IsManager]
+        return [permission() for permission in permission_classes]
+       
 @api_view(['POST', 'DELETE', 'GET'])
 @permission_classes([IsAdminUser])
 def manager(request):
