@@ -1,0 +1,7 @@
+user names
+    admin
+    delivery
+    customer
+    manager
+
+thepassword for all is "secretpassword"
